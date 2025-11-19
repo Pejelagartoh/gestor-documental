@@ -1,0 +1,132 @@
+<mat-card>
+  <div class="header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h2 style="margin:0">Registro Documental</h2>
+    <button mat-raised-button color="primary" (click)="openAddDialog()">➕ Nuevo Documento</button>
+  </div>
+
+  <div class="table-container" style="overflow:auto; max-height:75vh;">
+    <table mat-table [dataSource]="documents" class="mat-elevation-z8" style="width:2000px;">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let e"> {{e.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tramo">
+        <th mat-header-cell *matHeaderCellDef> Tramo </th>
+        <td mat-cell *matCellDef="let e"> {{e.tramo}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo_registro">
+        <th mat-header-cell *matHeaderCellDef> Tipo Documento </th>
+        <td mat-cell *matCellDef="let e"> {{e.tipo_documento}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef> Tipo Documento </th>
+        <td mat-cell *matCellDef="let e"> {{e.tipo}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="numero_documento">
+        <th mat-header-cell *matHeaderCellDef> N° Documento </th>
+        <td mat-cell *matCellDef="let e"> {{e.numero_documento}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="registro_sgd">
+        <th mat-header-cell *matHeaderCellDef> Registro SGD </th>
+        <td mat-cell *matCellDef="let e"> {{e.registro_sgd}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fecha_documento">
+        <th mat-header-cell *matHeaderCellDef> Fecha Documento </th>
+        <td mat-cell *matCellDef="let e"> {{e.fecha_documento | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo_respuesta">
+        <th mat-header-cell *matHeaderCellDef> Tipo Documento </th>
+        <td mat-cell *matCellDef="let e"> {{e.tipo_respuesta}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fecha_respuesta">
+        <th mat-header-cell *matHeaderCellDef> Fecha Ingreso </th>
+        <td mat-cell *matCellDef="let e"> {{e.fecha_respuesta | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fecha_ingreso">
+        <th mat-header-cell *matHeaderCellDef> Fecha Ingreso </th>
+        <td mat-cell *matCellDef="let e"> {{e.fecha_ingreso | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="remitente">
+        <th mat-header-cell *matHeaderCellDef> Remitente </th>
+        <td mat-cell *matCellDef="let e"> {{e.remitente}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cargo_remitente">
+        <th mat-header-cell *matHeaderCellDef> Cargo Remitente </th>
+        <td mat-cell *matCellDef="let e"> {{e.cargo_remitente}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="a">
+        <th mat-header-cell *matHeaderCellDef> a </th>
+        <td mat-cell *matCellDef="let e"> {{e.a}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="destinatario">
+        <th mat-header-cell *matHeaderCellDef> Destinatario </th>
+        <td mat-cell *matCellDef="let e"> {{e.destinatario}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cargo_destinatario">
+        <th mat-header-cell *matHeaderCellDef> Cargo Destinatario </th>
+        <td mat-cell *matCellDef="let e"> {{e.cargo_destinatario}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="antecedentes">
+        <th mat-header-cell *matHeaderCellDef> Antecedentes </th>
+        <td mat-cell *matCellDef="let e"> {{e.antecedentes}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="materia">
+        <th mat-header-cell *matHeaderCellDef> Materia </th>
+        <td mat-cell *matCellDef="let e"> {{e.materia}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="area_responsable">
+        <th mat-header-cell *matHeaderCellDef> Área Responsable </th>
+        <td mat-cell *matCellDef="let e"> {{e.area_responsable}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="instruye_respuesta">
+        <th mat-header-cell *matHeaderCellDef> Instruye Respuesta </th>
+        <td mat-cell *matCellDef="let e"> {{e.instruye_respuesta}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="registro_salida">
+        <th mat-header-cell *matHeaderCellDef> Registro Salida </th>
+        <td mat-cell *matCellDef="let e"> {{e.registro_salida}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef> Estado </th>
+        <td mat-cell *matCellDef="let e"> {{e.estado}} </td>
+      </ng-container>
+
+      <!-- Acciones -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let e">
+          <button mat-icon-button color="primary" (click)="editDocument(e)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteDocument(e.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</mat-card>

@@ -1,0 +1,107 @@
+<h2 mat-dialog-title>Registro de recepción de documentos</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="form-grid">
+
+    <!-- Tramo -->
+    <mat-form-field appearance="outline">
+      <mat-label>Tramo</mat-label>
+      <mat-select formControlName="tramo">
+        <mat-option *ngFor="let t of tramos" [value]="t">{{ t }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Tipo Documento -->
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo Documento</mat-label>
+      <mat-select formControlName="tipo">
+        <mat-option *ngFor="let td of tiposDocumento" [value]="td">{{ td }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Reg. SGD -->
+    <mat-form-field appearance="outline">
+      <mat-label>Reg. SGD</mat-label>
+      <input matInput formControlName="registro_sgd" />
+    </mat-form-field>
+
+    <!-- N° Documento -->
+    <mat-form-field appearance="outline">
+      <mat-label>N° Documento</mat-label>
+      <input matInput formControlName="numero_documento" />
+    </mat-form-field>
+
+    <!-- Fecha Documento -->
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha Documento</mat-label>
+      <input matInput [matDatepicker]="fd" formControlName="fecha_documento" />
+      <mat-datepicker-toggle matSuffix [for]="fd"></mat-datepicker-toggle>
+      <mat-datepicker #fd></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Ingreso Documento -->
+    <mat-form-field appearance="outline">
+      <mat-label>Ingreso Documento</mat-label>
+      <input matInput [matDatepicker]="fi" formControlName="fecha_ingreso" />
+      <mat-datepicker-toggle matSuffix [for]="fi"></mat-datepicker-toggle>
+      <mat-datepicker #fi></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Remitente -->
+    <mat-form-field appearance="outline">
+      <mat-label>Remitente</mat-label>
+      <input matInput formControlName="remitente" />
+    </mat-form-field>
+
+    <!-- Cargo Remitente -->
+    <mat-form-field appearance="outline">
+      <mat-label>Cargo Remitente</mat-label>
+      <input matInput formControlName="cargo_remitente" />
+    </mat-form-field>
+
+    <!-- Destinatario -->
+    <mat-form-field appearance="outline">
+      <mat-label>Destinatario</mat-label>
+      <input matInput formControlName="destinatario" />
+    </mat-form-field>
+
+    <!-- Cargo Destinatario -->
+    <mat-form-field appearance="outline">
+      <mat-label>Cargo Destinatario</mat-label>
+      <input matInput formControlName="cargo_destinatario" />
+    </mat-form-field>
+
+    <!-- Antecedentes -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Antecedentes</mat-label>
+      <textarea matInput formControlName="antecedentes" rows="2"></textarea>
+    </mat-form-field>
+
+    <!-- Materia -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Materia</mat-label>
+      <textarea matInput formControlName="materia" rows="2"></textarea>
+    </mat-form-field>
+
+    <!-- Área Responsable -->
+    <mat-form-field appearance="outline">
+      <mat-label>Área Responsable</mat-label>
+      <mat-select formControlName="area_responsable">
+        <mat-option *ngFor="let a of areas" [value]="a">{{ a }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Instruye Respuesta -->
+    <mat-form-field appearance="outline">
+      <mat-label>Instruye Respuesta</mat-label>
+      <mat-select formControlName="instruye_respuesta">
+        <mat-option *ngFor="let ir of instruyeOpciones" [value]="ir">{{ ir }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dialogRef.close()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="save()">Guardar</button>
+</mat-dialog-actions>
