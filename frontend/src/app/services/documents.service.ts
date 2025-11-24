@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// 💡 INTERFAZ CORREGIDA Y SIMPLIFICADA (22 campos esenciales en camelCase)
 export interface Documento {
   id?: number;
   tramo?: string;
@@ -35,6 +34,8 @@ export interface Documento {
 export class DocumentsService {
   // La URL es correcta ya que tu backend está en el puerto 3000
   private apiUrl = 'http://localhost:3000/api/documentos';
+  private mailUrl = 'http://localhost:3000/api/send-email';
+
 
   constructor(private http: HttpClient) {}
 
@@ -63,5 +64,15 @@ export class DocumentsService {
   // 🔹 Eliminar documento
   deleteDocumento(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  sendDocumentEmail(documentId: number, recipient: string, subject: string, body: string): Observable<any> {
+    const payload = {
+      documentId: documentId,
+      recipient: recipient,
+      subject: subject,
+      body: body
+    };
+    return this.http.post(this.mailUrl, payload);
   }
 }

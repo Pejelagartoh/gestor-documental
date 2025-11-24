@@ -1,9 +1,64 @@
+/* Estilos generales de la cuadrícula */
 .form-grid {
   display: grid;
+  /* Usa auto-fill/minmax para una grilla fluida y responsive */
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
+  padding: 16px 0;
 }
 
+/* Para que ciertos campos ocupen un ancho mayor (2 columnas) en pantallas grandes/medianas */
 .full-width {
   grid-column: span 2;
+}
+
+/* Contenedor especial para el input de archivo */
+.file-input-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.file-url-field {
+  /* Permite que el campo de URL ocupe el espacio disponible */
+  flex-grow: 1;
+}
+
+.selected-file-name {
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  color: #4CAF50;
+  margin-left: 10px;
+  padding-top: 10px;
+  /* Asegura que no se desborde */
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mat-form-field-checkbox {
+  display: flex;
+  align-items: center;
+  padding-top: 25px;
+}
+
+/* Media Query: Asegura que en pantallas muy pequeñas (teléfonos) los elementos anchos y de archivo fluyan verticalmente */
+@media (max-width: 768px) {
+  /* Para garantizar que los campos "full-width" solo ocupen 1 columna en móvil */
+  .full-width {
+    grid-column: span 1;
+  }
+
+  .file-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .file-select-button {
+    margin-left: 0 !important;
+  }
+  .selected-file-name {
+    margin-left: 0;
+  }
 }

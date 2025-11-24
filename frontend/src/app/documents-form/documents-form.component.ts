@@ -9,7 +9,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon'; // Importamos MatIconModule
+import { MatIconModule } from '@angular/material/icon';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DocumentsService, Documento } from '../services/documents.service';
 
 @Component({
@@ -28,7 +29,8 @@ import { DocumentsService, Documento } from '../services/documents.service';
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatIconModule // Añadido
+    MatIconModule,
+    HttpClientModule
   ],
   templateUrl: './documents-form.component.html',
   styleUrls: ['./documents-form.component.css']
@@ -37,10 +39,9 @@ export class DocumentsFormComponent {
   form: FormGroup;
   isEditMode: boolean;
 
-  // ✅ NUEVAS PROPIEDADES PARA GESTIONAR EL ARCHIVO EN EL FRONTEND
   selectedFile: File | null = null;
   selectedFileName: string = '';
-  // ------------------------------------------------------------------
+  private apiUrl = 'http://localhost:3000/api/documentos';
 
   tramos = ['RBPM', 'PMPA', 'AIF'];
   tiposDocumento = ['Ordinario', 'Carta', 'Nota', 'Minuta', 'Folio', 'Resuel', 'Correo', 'Memo'];
@@ -51,6 +52,7 @@ export class DocumentsFormComponent {
     private fb: FormBuilder,
     private service: DocumentsService,
     public dialogRef: MatDialogRef<DocumentsFormComponent>,
+    private http: HttpClient,
     @Inject(MAT_DIALOG_DATA) public data: Documento | null
   ) {
     this.isEditMode = !!data?.id;
@@ -79,8 +81,7 @@ export class DocumentsFormComponent {
       a: [data?.a || ''],
 
       estado: [data?.estado || 'Pendiente'],
-      // ✅ Aquí se guarda la URL permanente del archivo
-      archivo: [data?.archivo || '']
+      archivo: [{value: data?.archivo || '', disabled: false}]
     });
   }
 
@@ -90,7 +91,6 @@ export class DocumentsFormComponent {
     return new Date(dateValue);
   }
 
-  // ✅ NUEVO: Manejador para el input de tipo file
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -98,24 +98,11 @@ export class DocumentsFormComponent {
     if (file) {
       this.selectedFile = file;
       this.selectedFileName = file.name;
-
-      // NOTA: Para este ejercicio, el campo 'archivo' solo contendrá la URL.
-      // Si el usuario selecciona un archivo, mostramos su nombre, pero debe subirlo
-      // a un servicio cloud y pegar la URL permanente en el campo de texto.
-
-      // Podríamos poner un placeholder de URL temporal aquí, pero es mejor que el
-      // usuario pegue la URL permanente, o suba el archivo y el backend genere la URL.
-
-      // Por ahora, solo ponemos el nombre del archivo en el control para que se sepa qué archivo se seleccionó.
-      // this.form.get('archivo')?.setValue(`[Pendiente de subir] ${file.name}`);
-
+      this.form.get('archivo')?.disable();
     } else {
       this.selectedFile = null;
       this.selectedFileName = '';
-      // Si el archivo ya existía (en modo edición), no borramos la URL existente.
-      if (!this.isEditMode) {
-        this.form.get('archivo')?.setValue('');
-      }
+      this.form.get('archivo')?.enable();
     }
   }
 
@@ -126,26 +113,77 @@ export class DocumentsFormComponent {
       return;
     }
 
-    const doc: Documento = this.form.value;
+    const doc: Documento = this.form.getRawValue() as Documento;
 
-    // 🛑 IMPORTANTE: Si selectedFile no es null, aquí debería iniciar el proceso de subida
-    // a Firebase Storage o similar, y esperar la URL de retorno antes de llamar al service.
-
-    if (this.isEditMode && doc.id) {
+    if (this.isEditMode && doc.id && !this.selectedFile) {
       this.service.updateDocumento(doc.id, doc).subscribe({
-        next: () => {
-          this.dialogRef.close(true);
-        },
+        next: () => this.dialogRef.close(true),
         error: (err: any) => console.error('Error actualizando documento', err)
       });
-    } else {
-      delete doc.id;
-      this.service.addDocumento(doc).subscribe({
-        next: () => {
-          this.dialogRef.close(true);
-        },
-        error: (err: any) => console.error('Error guardando documento', err)
+    } else if (this.isEditMode && doc.id && this.selectedFile) {
+      // En modo edición, el servidor no acepta nuevos archivos, solo la URL.
+      console.warn('Advertencia: No se permite subir un nuevo archivo en modo edición. Actualice solo la URL pública o cree un nuevo registro.');
+      this.service.updateDocumento(doc.id, doc).subscribe({
+        next: () => this.dialogRef.close(true),
+        error: (err: any) => console.error('Error actualizando documento', err)
       });
+
+    } else {
+      // Modo creación (con o sin archivo)
+      this.createDocumento(doc);
     }
+
+    this.form.get('archivo')?.enable();
+  }
+
+  private createDocumento(doc: Documento) {
+    const formData = new FormData();
+
+    if (this.selectedFile) {
+      formData.append('file', this.selectedFile, this.selectedFile.name);
+    }
+
+    // Usamos Object.entries() para iterar de forma segura
+    for (const [key, value] of Object.entries(doc)) {
+      if (key !== 'id') {
+        // 1. Manejar Date
+        if (value instanceof Date) {
+          formData.append(key, value.toISOString());
+        }
+        // 2. Manejar Boolean (corregido typeof)
+        else if (typeof value === 'boolean') {
+          formData.append(key, value ? 'true' : 'false');
+        }
+        // 3. Manejar otros tipos (incluyendo la URL vacía si el archivo fue seleccionado)
+        else if (value !== null && value !== undefined) {
+          formData.append(key, String(value));
+        }
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // ✅ ACTUALIZACIÓN CLAVE: Llamada al servicio de correo
+    // ----------------------------------------------------------------------
+    // Usamos <Documento> para tipar la respuesta (que incluye el nuevo ID)
+    this.http.post<Documento>(this.apiUrl, formData).subscribe({
+      next: (newDoc) => {
+        // La respuesta newDoc contiene el ID y la URL del archivo
+        const recipient = 'victor.rodriguez.f@applusglobal.com'; // Dirección de notificación fija (puedes hacerla dinámica después)
+        const subject = `[ALTA] Nuevo Documento de Entrada N° ${newDoc.nroDocumento}`;
+        const body = `Se ha registrado el documento y el archivo ya está disponible. Por favor, revise y asigne responsabilidades.`;
+
+        // Llamar al servicio de correo. Usamos '!' en newDoc.id para forzar el tipo number.
+        this.service.sendDocumentEmail(newDoc.id!, recipient, subject, body).subscribe({
+          next: () => console.log('✅ Correo de notificación enviado con éxito.'),
+          error: (mailErr) => console.error('❌ Advertencia: Documento guardado, pero error al enviar correo:', mailErr)
+        });
+
+        this.dialogRef.close(true); // Cerrar después de intentar el envío del correo
+      },
+      error: (err) => console.error('❌ Error guardando documento y archivo:', err)
+    });
+    // ----------------------------------------------------------------------
+
+    this.form.get('archivo')?.enable();
   }
 }
