@@ -1,107 +1,240 @@
-<h2 mat-dialog-title>Registro de recepción de documentos</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Editar' : 'Registro de' }} recepción de documentos</h2>
 <mat-dialog-content>
   <form [formGroup]="form" class="form-grid">
 
-    <!-- Tramo -->
+    <!-- Tramo (OBLIGATORIO) -->
     <mat-form-field appearance="outline">
-      <mat-label>Tramo</mat-label>
+      <mat-label>Tramo *</mat-label>
       <mat-select formControlName="tramo">
         <mat-option *ngFor="let t of tramos" [value]="t">{{ t }}</mat-option>
       </mat-select>
+      <mat-error *ngIf="form.get('tramo')?.hasError('required')">Este campo es obligatorio</mat-error>
     </mat-form-field>
 
-    <!-- Tipo Documento -->
+    <!-- Tipo Documento (OBLIGATORIO) -->
     <mat-form-field appearance="outline">
-      <mat-label>Tipo Documento</mat-label>
-      <mat-select formControlName="tipo">
+      <mat-label>Tipo Documento *</mat-label>
+      <mat-select formControlName="tipoDocumento">
         <mat-option *ngFor="let td of tiposDocumento" [value]="td">{{ td }}</mat-option>
       </mat-select>
+      <mat-error *ngIf="form.get('tipoDocumento')?.hasError('required')">Este campo es obligatorio</mat-error>
     </mat-form-field>
 
-    <!-- Reg. SGD -->
+    <!-- N° Documento (OBLIGATORIO) -->
     <mat-form-field appearance="outline">
-      <mat-label>Reg. SGD</mat-label>
-      <input matInput formControlName="registro_sgd" />
+      <mat-label>N° Documento *</mat-label>
+      <input matInput formControlName="nroDocumento" />
+      <mat-error *ngIf="form.get('nroDocumento')?.hasError('required')">Este campo es obligatorio</mat-error>
     </mat-form-field>
 
-    <!-- N° Documento -->
+    <!-- Fecha Documento (OBLIGATORIO) -->
     <mat-form-field appearance="outline">
-      <mat-label>N° Documento</mat-label>
-      <input matInput formControlName="numero_documento" />
-    </mat-form-field>
-
-    <!-- Fecha Documento -->
-    <mat-form-field appearance="outline">
-      <mat-label>Fecha Documento</mat-label>
-      <input matInput [matDatepicker]="fd" formControlName="fecha_documento" />
+      <mat-label>Fecha Documento *</mat-label>
+      <input matInput [matDatepicker]="fd" formControlName="fechaDocumento" />
       <mat-datepicker-toggle matSuffix [for]="fd"></mat-datepicker-toggle>
       <mat-datepicker #fd></mat-datepicker>
+      <mat-error *ngIf="form.get('fechaDocumento')?.hasError('required')">Este campo es obligatorio</mat-error>
     </mat-form-field>
 
-    <!-- Ingreso Documento -->
+    <!-- Fecha Ingreso (OBLIGATORIO) -->
     <mat-form-field appearance="outline">
-      <mat-label>Ingreso Documento</mat-label>
-      <input matInput [matDatepicker]="fi" formControlName="fecha_ingreso" />
+      <mat-label>Fecha Ingreso *</mat-label>
+      <input matInput [matDatepicker]="fi" formControlName="fechaIngreso" />
       <mat-datepicker-toggle matSuffix [for]="fi"></mat-datepicker-toggle>
       <mat-datepicker #fi></mat-datepicker>
+      <mat-error *ngIf="form.get('fechaIngreso')?.hasError('required')">Este campo es obligatorio</mat-error>
     </mat-form-field>
 
-    <!-- Remitente -->
+    <!-- Campos Opcionales -->
     <mat-form-field appearance="outline">
       <mat-label>Remitente</mat-label>
       <input matInput formControlName="remitente" />
     </mat-form-field>
 
-    <!-- Cargo Remitente -->
     <mat-form-field appearance="outline">
       <mat-label>Cargo Remitente</mat-label>
-      <input matInput formControlName="cargo_remitente" />
+      <input matInput formControlName="cargoRemitente" />
     </mat-form-field>
 
-    <!-- Destinatario -->
     <mat-form-field appearance="outline">
       <mat-label>Destinatario</mat-label>
       <input matInput formControlName="destinatario" />
     </mat-form-field>
 
-    <!-- Cargo Destinatario -->
     <mat-form-field appearance="outline">
       <mat-label>Cargo Destinatario</mat-label>
-      <input matInput formControlName="cargo_destinatario" />
+      <input matInput formControlName="cargoDestinatario" />
     </mat-form-field>
 
-    <!-- Antecedentes -->
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Antecedentes</mat-label>
-      <textarea matInput formControlName="antecedentes" rows="2"></textarea>
+      <mat-label>Antecedentes Documento</mat-label>
+      <textarea matInput formControlName="antecedentesDocumento" rows="2"></textarea>
     </mat-form-field>
 
-    <!-- Materia -->
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Materia</mat-label>
-      <textarea matInput formControlName="materia" rows="2"></textarea>
+      <mat-label>Materia Documento</mat-label>
+      <textarea matInput formControlName="materiaDocumento" rows="2"></textarea>
     </mat-form-field>
 
-    <!-- Área Responsable -->
+    <!-- Área Responsable (OBLIGATORIO) -->
     <mat-form-field appearance="outline">
-      <mat-label>Área Responsable</mat-label>
-      <mat-select formControlName="area_responsable">
+      <mat-label>Área Responsable *</mat-label>
+      <mat-select formControlName="areaResponsable">
         <mat-option *ngFor="let a of areas" [value]="a">{{ a }}</mat-option>
       </mat-select>
+      <mat-error *ngIf="form.get('areaResponsable')?.hasError('required')">Este campo es obligatorio</mat-error>
     </mat-form-field>
 
-    <!-- Instruye Respuesta -->
+    <!-- Checkbox Instruye Respuesta (Opcional, booleano) -->
+    <div class="mat-form-field-wrapper mat-form-field-checkbox">
+      <mat-checkbox formControlName="instruyeRespuesta" color="primary">
+        Instruye Respuesta
+      </mat-checkbox>
+    </div>
+
+    <!-- Sección 2: Datos de Respuesta (Opcional) -->
     <mat-form-field appearance="outline">
-      <mat-label>Instruye Respuesta</mat-label>
-      <mat-select formControlName="instruye_respuesta">
-        <mat-option *ngFor="let ir of instruyeOpciones" [value]="ir">{{ ir }}</mat-option>
+      <mat-label>Registro Salida</mat-label>
+      <input matInput formControlName="registroSalida" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo Respuesta</mat-label>
+      <input matInput formControlName="tipoRespuesta" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha Respuesta</mat-label>
+      <input matInput [matDatepicker]="fr" formControlName="fechaRespuesta" />
+      <mat-datepicker-toggle matSuffix [for]="fr"></mat-datepicker-toggle>
+      <mat-datepicker #fr></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Remite (Respuesta)</mat-label>
+      <input matInput formControlName="remite" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>A (Respuesta)</mat-label>
+      <input matInput formControlName="a" />
+    </mat-form-field>
+
+    <!-- Sección 3: Estado y Archivo -->
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select formControlName="estado">
+        <mat-option *ngFor="let s of estados" [value]="s">{{ s }}</mat-option>
       </mat-select>
     </mat-form-field>
+
+    <!-- ✅ CAMPO DE ARCHIVO ACTUALIZADO -->
+    <div class="full-width file-input-group">
+      <!-- 1. Campo para pegar la URL del archivo (el valor que se guarda en DB) -->
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>URL Pública del Archivo</mat-label>
+        <input
+          matInput
+          formControlName="archivo"
+          placeholder="Pegue aquí el enlace permanente al documento"
+          [readonly]="selectedFileName"
+        />
+        <mat-hint>El valor debe ser un enlace web permanente.</mat-hint>
+      </mat-form-field>
+
+      <!-- 2. Botón para seleccionar un archivo local (solo visual) -->
+      <input
+        type="file"
+        style="display: none;"
+        #fileInput
+        (change)="onFileSelected($event)"
+        accept="application/pdf,image/*"
+      >
+      <button
+        mat-raised-button
+        color="accent"
+        (click)="fileInput.click()"
+        type="button"
+        style="margin-left: 8px;"
+      >
+        <mat-icon>folder</mat-icon> {{ selectedFileName ? 'Cambiar Archivo' : 'Seleccionar Archivo Local' }}
+      </button>
+
+      <!-- 3. Indicador de archivo seleccionado -->
+      <div *ngIf="selectedFileName" class="selected-file-name">
+        <mat-icon color="primary" style="margin-right: 4px;">attach_file</mat-icon>
+        {{ selectedFileName }}
+      </div>
+    </div>
+    <!-- ---------------------------------------------------- -->
 
   </form>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="dialogRef.close()">Cancelar</button>
-  <button mat-raised-button color="primary" (click)="save()">Guardar</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="save()"
+    [disabled]="form.invalid"
+  >
+    {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+  </button>
 </mat-dialog-actions>
+
+<style>
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 16px 0;
+  }
+
+  .full-width {
+    grid-column: span 3;
+  }
+
+  /* Contenedor especial para el input de archivo */
+  .file-input-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .file-input-group > mat-form-field {
+    flex-grow: 1;
+  }
+
+  .selected-file-name {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    color: #4CAF50;
+    margin-left: 10px;
+    padding-top: 10px;
+    /* Asegura que no se desborde */
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mat-form-field-checkbox {
+    display: flex;
+    align-items: center;
+    padding-top: 25px;
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .full-width {
+      grid-column: span 1;
+    }
+    .file-input-group {
+      flex-direction: column;
+    }
+  }
+</style>

@@ -2,39 +2,29 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+// 💡 INTERFAZ CORREGIDA Y SIMPLIFICADA (22 campos esenciales en camelCase)
 export interface Documento {
   id?: number;
-  tipo_registro?: string;
   tramo?: string;
-  tipo?: string;
-  numero_documento?: string;
-  registro_sgd?: string;
-  fecha_documento?: string;
-  fecha_ingreso?: string;
+  tipoDocumento?: string; // Corregido a camelCase
+  nroDocumento?: string;  // Corregido a camelCase
+  fechaDocumento?: string; // Corregido a camelCase
+  fechaIngreso?: string;  // Corregido a camelCase
   remitente?: string;
-  cargo_remitente?: string;
+  cargoRemitente?: string; // Corregido a camelCase
   destinatario?: string;
-  cargo_destinatario?: string;
-  antecedentes?: string;
-  materia?: string;
-  area_responsable?: string;
-  instruye_respuesta?: string;
-  registro_entrada?: string;
-  registro_salida?: string;
-  fecha_recepcion?: string;
-  nro_loe?: string;
-  incluye?: string;
-  cuenta?: string;
-  plazo?: number;
-  fecha_vencimiento?: string;
-  alerta_dias?: number;
-  fecha_respuesta?: string;
-  archivo_url?: string;
+  cargoDestinatario?: string; // Corregido a camelCase
+  antecedentesDocumento?: string; // Corregido a camelCase
+  materiaDocumento?: string; // Corregido a camelCase
+  areaResponsable?: string; // Corregido a camelCase
+  instruyeRespuesta?: boolean; // Corregido a camelCase y tipo a boolean
+  registroSalida?: string; // Corregido a camelCase
+  tipoRespuesta?: string; // Corregido a camelCase
+  fechaRespuesta?: string; // Corregido a camelCase (Asumimos que es 'Fecha')
+  remite?: string;
+  a?: string;
   estado?: string;
-  cons?: boolean;
-  seg?: boolean;
-  prev?: boolean;
-  hitos?: boolean;
+  archivo?: string; // Corregido a 'archivo' (URL)
   created_at?: string;
   updated_at?: string;
 }
@@ -43,9 +33,12 @@ export interface Documento {
   providedIn: 'root'
 })
 export class DocumentsService {
-  private apiUrl = 'http://localhost:3000/api/documentos'; // 👈 Backend URL
+  // La URL es correcta ya que tu backend está en el puerto 3000
+  private apiUrl = 'http://localhost:3000/api/documentos';
 
   constructor(private http: HttpClient) {}
+
+  // La lógica de las funciones HTTP es correcta y no necesita cambios:
 
   // 🔹 Obtener todos los documentos
   getDocumentos(): Observable<Documento[]> {

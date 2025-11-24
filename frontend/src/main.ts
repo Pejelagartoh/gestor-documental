@@ -8,7 +8,7 @@ import { AppComponent } from './app/app.component';
 bootstrapApplication(AppComponent, {
   providers: [
     provideAnimations(),
-    provideNativeDateAdapter(), // 👈 necesario para el DatePicker
+    provideNativeDateAdapter(),
     importProvidersFrom(HttpClientModule)
   ],
 }).catch(err => console.error(err));
