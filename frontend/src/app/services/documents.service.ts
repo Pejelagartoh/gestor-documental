@@ -2,28 +2,29 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+// Usamos la interfaz Documento que definiste, es lo suficientemente amplia para ambos tipos.
 export interface Documento {
   id?: number;
   tramo?: string;
-  tipoDocumento?: string; // Corregido a camelCase
-  nroDocumento?: string;  // Corregido a camelCase
-  fechaDocumento?: string; // Corregido a camelCase
-  fechaIngreso?: string;  // Corregido a camelCase
+  tipoDocumento?: string;
+  nroDocumento?: string;
+  fechaDocumento?: string;
+  fechaIngreso?: string;
   remitente?: string;
-  cargoRemitente?: string; // Corregido a camelCase
+  cargoRemitente?: string;
   destinatario?: string;
-  cargoDestinatario?: string; // Corregido a camelCase
-  antecedentesDocumento?: string; // Corregido a camelCase
-  materiaDocumento?: string; // Corregido a camelCase
-  areaResponsable?: string; // Corregido a camelCase
-  instruyeRespuesta?: boolean; // Corregido a camelCase y tipo a boolean
-  registroSalida?: string; // Corregido a camelCase
-  tipoRespuesta?: string; // Corregido a camelCase
-  fechaRespuesta?: string; // Corregido a camelCase (Asumimos que es 'Fecha')
+  cargoDestinatario?: string;
+  antecedentesDocumento?: string;
+  materiaDocumento?: string;
+  areaResponsable?: string;
+  instruyeRespuesta?: boolean;
+  registroSalida?: string;
+  tipoRespuesta?: string;
+  fechaRespuesta?: string;
   remite?: string;
   a?: string;
   estado?: string;
-  archivo?: string; // Corregido a 'archivo' (URL)
+  archivo?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -32,40 +33,45 @@ export interface Documento {
   providedIn: 'root'
 })
 export class DocumentsService {
-  // La URL es correcta ya que tu backend está en el puerto 3000
-  private apiUrl = 'http://localhost:3000/api/documentos';
+  // URLs para los diferentes endpoints
+  private apiUrlEntrada = 'http://localhost:3000/api/documentos'; // Endpoint original (asumimos Entrada)
+  private apiUrlSalida = 'http://localhost:3000/api/documentos-salida'; // NUEVO: Endpoint para Salida
   private mailUrl = 'http://localhost:3000/api/send-email';
-
 
   constructor(private http: HttpClient) {}
 
-  // La lógica de las funciones HTTP es correcta y no necesita cambios:
-
-  // 🔹 Obtener todos los documentos
-  getDocumentos(): Observable<Documento[]> {
-    return this.http.get<Documento[]>(this.apiUrl);
+  // 1. OBTENER DOCUMENTOS DE ENTRADA
+  // Renombramos el antiguo getDocumentos() a getDocumentosEntrada() para mayor claridad.
+  getDocumentosEntrada(): Observable<Documento[]> {
+    return this.http.get<Documento[]>(this.apiUrlEntrada);
   }
 
-  // 🔹 Obtener un documento por ID
+  // 2. OBTENER DOCUMENTOS DE SALIDA (Método requerido por el componente)
+  getDocumentosSalida(): Observable<Documento[]> {
+    return this.http.get<Documento[]>(this.apiUrlSalida);
+  }
+
+  // 🔹 Obtener un documento por ID (utiliza la URL de entrada por defecto)
   getDocumentoById(id: number): Observable<Documento> {
-    return this.http.get<Documento>(`${this.apiUrl}/${id}`);
+    return this.http.get<Documento>(`${this.apiUrlEntrada}/${id}`);
   }
 
   // 🔹 Crear nuevo documento
   addDocumento(data: Documento): Observable<Documento> {
-    return this.http.post<Documento>(this.apiUrl, data);
+    return this.http.post<Documento>(this.apiUrlEntrada, data);
   }
 
   // 🔹 Actualizar documento existente
   updateDocumento(id: number, data: Documento): Observable<Documento> {
-    return this.http.put<Documento>(`${this.apiUrl}/${id}`, data);
+    return this.http.put<Documento>(`${this.apiUrlEntrada}/${id}`, data);
   }
 
   // 🔹 Eliminar documento
   deleteDocumento(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.apiUrlEntrada}/${id}`);
   }
 
+  // 🔹 Enviar email
   sendDocumentEmail(documentId: number, recipient: string, subject: string, body: string): Observable<any> {
     const payload = {
       documentId: documentId,

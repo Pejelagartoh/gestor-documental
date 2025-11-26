@@ -1,7 +1,35 @@
-<mat-toolbar color="primary">
-  Gestor Documental
+<mat-toolbar color="primary" class="mat-elevation-z4">
+  <mat-icon>folder_open</mat-icon>
+  <span class="ml-2">Gestor Documental</span>
 </mat-toolbar>
 
 <div style="padding: 20px;">
-  <app-documents-list></app-documents-list>
+  <!-- Contenedor de Pestañas de Angular Material -->
+  <mat-tab-group animationDuration="500ms">
+
+    <!-- Pestaña 1: Documentos de Entrada (Recepción) -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="mr-2">file_download</mat-icon>
+        Documentos de Entrada
+      </ng-template>
+      <div class="mt-4">
+        <!-- Selector para el componente de lista de Entrada -->
+        <app-documentos-entrada-list></app-documentos-entrada-list>
+      </div>
+    </mat-tab>
+
+    <!-- Pestaña 2: Documentos de Salida (Envío) -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="mr-2">file_upload</mat-icon>
+        Documentos de Salida
+      </ng-template>
+      <div class="mt-4">
+        <!-- Selector para el componente de lista de Salida -->
+        <app-documentos-salida-list></app-documentos-salida-list>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
 </div>

@@ -10,7 +10,7 @@ import { DocumentosEntradaFormComponent } from '../documentos-entrada-form/docum
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-documents-list',
+  selector: 'app-documentos-entrada-list',
   standalone: true,
   imports: [CommonModule, MatCardModule, MatTableModule, MatButtonModule, MatDialogModule, MatIconModule],
   templateUrl: './documentos-entrada-list.component.html',
@@ -36,7 +36,7 @@ export class DocumentosEntradaListComponent implements OnInit {
   }
 
   loadDocuments() {
-    this.documentsService.getDocumentos().subscribe({
+    this.documentsService.getDocumentosEntrada().subscribe({
       next: (data: Documento[]) => this.documents = data, // Usar Documento[] para tipado
       error: (err: any) => console.error('Error cargando documentos', err)
     });
