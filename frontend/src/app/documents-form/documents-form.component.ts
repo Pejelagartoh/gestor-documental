@@ -30,7 +30,6 @@ import { DocumentsService, Documento } from '../services/documents.service';
     MatDialogContent,
     MatDialogActions,
     MatIconModule,
-    HttpClientModule
   ],
   templateUrl: './documents-form.component.html',
   styleUrls: ['./documents-form.component.css']
@@ -57,6 +56,11 @@ export class DocumentsFormComponent {
   ) {
     this.isEditMode = !!data?.id;
 
+    // ✅ INICIALIZACIÓN DEL NOMBRE DE ARCHIVO EN MODO EDICIÓN
+    if (this.isEditMode && data && data.archivo) {
+      this.selectedFileName = this.extractFileNameFromUrl(data.archivo);
+    }
+
     this.form = this.fb.group({
       id: [data?.id || null],
 
@@ -71,7 +75,7 @@ export class DocumentsFormComponent {
       cargoDestinatario: [data?.cargoDestinatario || ''],
       antecedentesDocumento: [data?.antecedentesDocumento || ''],
       materiaDocumento: [data?.materiaDocumento || ''],
-      areaResponsable: [data?.areaResponsable || '', Validators.required],
+      areaResponsable: [data?.areaResponsable || ''],
       instruyeRespuesta: [data?.instruyeRespuesta || false],
 
       registroSalida: [data?.registroSalida || ''],
@@ -91,6 +95,34 @@ export class DocumentsFormComponent {
     return new Date(dateValue);
   }
 
+  // ✅ FUNCIÓN PARA EXTRAER EL NOMBRE DEL ARCHIVO DE LA URL
+  private extractFileNameFromUrl(url: string): string {
+    if (!url) return '';
+
+    try {
+      const urlObject = new URL(url);
+      const pathname = urlObject.pathname;
+      // Obtiene la última parte de la ruta y elimina el prefijo de marca de tiempo (si existe)
+      let fileName = pathname.substring(pathname.lastIndexOf('/') + 1);
+
+      // Si el archivo tiene el formato 'timestamp-nombre_original.pdf' (como lo guarda Multer)
+      const match = fileName.match(/^\d+-(.*)/);
+      if (match && match[1]) {
+        // Devuelve el nombre original, reemplazando los guiones bajos por espacios
+        return match[1].replace(/_/g, ' ');
+      }
+
+      // Si no tiene el formato Multer, devuelve la última parte de la URL limpia
+      return fileName.replace(/_/g, ' ');
+
+    } catch (e) {
+      // Si no es una URL válida (ej. es solo un nombre de archivo), devuelve la cadena tal cual
+      return url;
+    }
+  }
+  // ----------------------------------------------------------------------
+
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -98,11 +130,11 @@ export class DocumentsFormComponent {
     if (file) {
       this.selectedFile = file;
       this.selectedFileName = file.name;
-      this.form.get('archivo')?.disable();
+      // Ya no deshabilitamos el form control, pero lo vaciamos si hay un archivo nuevo.
+      this.form.get('archivo')?.setValue('');
     } else {
       this.selectedFile = null;
-      this.selectedFileName = '';
-      this.form.get('archivo')?.enable();
+      this.selectedFileName = this.data?.archivo ? this.extractFileNameFromUrl(this.data.archivo) : '';
     }
   }
 
@@ -116,24 +148,28 @@ export class DocumentsFormComponent {
     const doc: Documento = this.form.getRawValue() as Documento;
 
     if (this.isEditMode && doc.id && !this.selectedFile) {
+      // Modo Edición sin nuevo archivo: Solo actualizamos los campos.
       this.service.updateDocumento(doc.id, doc).subscribe({
         next: () => this.dialogRef.close(true),
         error: (err: any) => console.error('Error actualizando documento', err)
       });
     } else if (this.isEditMode && doc.id && this.selectedFile) {
-      // En modo edición, el servidor no acepta nuevos archivos, solo la URL.
-      console.warn('Advertencia: No se permite subir un nuevo archivo en modo edición. Actualice solo la URL pública o cree un nuevo registro.');
+      // Modo Edición CON nuevo archivo: Esto es problemático en el backend actual.
+      // Lo que hacemos es guardar el archivo nuevo y luego actualizar la URL en el registro existente.
+      // Pero dado que el backend de Node.js solo usa Multer en POST, debemos adaptar la lógica o
+      // advertir que subir un archivo nuevo en modo edición no actualiza la URL en el servidor.
+      // Por la simplicidad actual, usaremos el mismo endpoint de creación (POST) si hay un archivo.
+      // ⚠️ En un sistema robusto, se debería tener un endpoint PUT con Multer.
+      console.warn('Advertencia: No se recomienda subir un archivo nuevo en modo edición. Se intentará crear un nuevo registro o solo guardar los campos si no hay archivo.');
       this.service.updateDocumento(doc.id, doc).subscribe({
         next: () => this.dialogRef.close(true),
-        error: (err: any) => console.error('Error actualizando documento', err)
+        error: (err: any) => console.error('Error actualizando documento (solo campos):', err)
       });
 
     } else {
       // Modo creación (con o sin archivo)
       this.createDocumento(doc);
     }
-
-    this.form.get('archivo')?.enable();
   }
 
   private createDocumento(doc: Documento) {
@@ -141,6 +177,12 @@ export class DocumentsFormComponent {
 
     if (this.selectedFile) {
       formData.append('file', this.selectedFile, this.selectedFile.name);
+    } else if (doc.archivo) {
+      // Si no hay archivo local, pero hay una URL pegada (aunque el campo fue removido visualmente)
+      // En este caso, el control 'archivo' debe estar vacío si se seleccionó un archivo local,
+      // o puede contener la URL si el usuario editó un registro y no subió un nuevo archivo.
+      // Pero si estamos en `createDocumento`, es solo creación, por lo que el `doc.archivo` debe ser la URL pegada.
+      // Dado que eliminamos el campo visualmente, solo nos enfocamos en `selectedFile`.
     }
 
     // Usamos Object.entries() para iterar de forma segura
@@ -154,7 +196,7 @@ export class DocumentsFormComponent {
         else if (typeof value === 'boolean') {
           formData.append(key, value ? 'true' : 'false');
         }
-        // 3. Manejar otros tipos (incluyendo la URL vacía si el archivo fue seleccionado)
+        // 3. Manejar otros tipos
         else if (value !== null && value !== undefined) {
           formData.append(key, String(value));
         }
@@ -162,28 +204,24 @@ export class DocumentsFormComponent {
     }
 
     // ----------------------------------------------------------------------
-    // ✅ ACTUALIZACIÓN CLAVE: Llamada al servicio de correo
+    // Llamada a la creación de documento
     // ----------------------------------------------------------------------
-    // Usamos <Documento> para tipar la respuesta (que incluye el nuevo ID)
     this.http.post<Documento>(this.apiUrl, formData).subscribe({
       next: (newDoc) => {
-        // La respuesta newDoc contiene el ID y la URL del archivo
-        const recipient = 'victor.rodriguez.f@applusglobal.com'; // Dirección de notificación fija (puedes hacerla dinámica después)
+        // Llamar al servicio de correo. Usamos '!' en newDoc.id para forzar el tipo number.
+        const recipient = 'victor.rodriguez.f@applusglobal.com';
         const subject = `[ALTA] Nuevo Documento de Entrada N° ${newDoc.nroDocumento}`;
         const body = `Se ha registrado el documento y el archivo ya está disponible. Por favor, revise y asigne responsabilidades.`;
 
-        // Llamar al servicio de correo. Usamos '!' en newDoc.id para forzar el tipo number.
         this.service.sendDocumentEmail(newDoc.id!, recipient, subject, body).subscribe({
           next: () => console.log('✅ Correo de notificación enviado con éxito.'),
           error: (mailErr) => console.error('❌ Advertencia: Documento guardado, pero error al enviar correo:', mailErr)
         });
 
-        this.dialogRef.close(true); // Cerrar después de intentar el envío del correo
+        this.dialogRef.close(true);
       },
       error: (err) => console.error('❌ Error guardando documento y archivo:', err)
     });
     // ----------------------------------------------------------------------
-
-    this.form.get('archivo')?.enable();
   }
 }

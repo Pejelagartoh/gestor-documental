@@ -128,23 +128,11 @@
       </mat-select>
     </mat-form-field>
 
-    <!-- ✅ CAMPO DE ARCHIVO ACTUALIZADO -->
-    <div class="full-width file-input-group">
-      <!-- 1. Campo para pegar la URL del archivo (el valor que se guarda en DB) -->
-      <!-- Clase 'file-url-field' para que el CSS le dé flex-grow: 1 -->
-      <mat-form-field appearance="outline" class="file-url-field">
-        <mat-label>URL Pública del Archivo</mat-label>
-        <input
-          matInput
-          formControlName="archivo"
-          placeholder="Pegue aquí el enlace permanente al documento"
-          [readonly]="selectedFileName"
-        />
-        <!-- Cambiado el hint para ser más claro sobre la funcionalidad -->
-        <mat-hint>Si selecciona un archivo, la URL se generará en el servidor.</mat-hint>
-      </mat-form-field>
+    <!-- ✅ CAMPO DE ARCHIVO ACTUALIZADO: Solo botón y visualización de nombre -->
+    <!-- Hemos eliminado el mat-form-field para la URL pública -->
+    <div class="full-width file-input-group single-line">
 
-      <!-- 2. Botón para seleccionar un archivo local (solo visual) -->
+      <!-- Input de archivo oculto -->
       <input
         type="file"
         style="display: none;"
@@ -152,6 +140,8 @@
         (change)="onFileSelected($event)"
         accept="application/pdf,image/*"
       >
+
+      <!-- Botón visible para seleccionar archivo -->
       <button
         mat-raised-button
         color="accent"
@@ -162,11 +152,12 @@
         <mat-icon>folder</mat-icon> {{ selectedFileName ? 'Cambiar Archivo' : 'Seleccionar Archivo Local' }}
       </button>
 
-      <!-- 3. Indicador de archivo seleccionado -->
+      <!-- Indicador de archivo seleccionado -->
       <div *ngIf="selectedFileName" class="selected-file-name">
         <mat-icon color="primary" style="margin-right: 4px;">attach_file</mat-icon>
-        {{ selectedFileName }}
+        <span class="file-name-text">{{ selectedFileName }}</span>
       </div>
+
     </div>
     <!-- ---------------------------------------------------- -->
 
