@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { DocumentsListComponent } from './documents-list/documents-list.component';
+import { DocumentosEntradaListComponent } from './documentos-entrada-list/documentos-entrada-list.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [MatToolbarModule, DocumentsListComponent],
+  imports: [MatToolbarModule, DocumentosEntradaListComponent],
   template: `
     <mat-toolbar color="primary">Gestor Documental</mat-toolbar>
     <div style="padding:16px;">

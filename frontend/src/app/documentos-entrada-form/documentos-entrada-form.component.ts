@@ -31,10 +31,10 @@ import { DocumentsService, Documento } from '../services/documents.service';
     MatDialogActions,
     MatIconModule,
   ],
-  templateUrl: './documents-form.component.html',
-  styleUrls: ['./documents-form.component.css']
+  templateUrl: './documentos-entrada-form.component.html',
+  styleUrls: ['./documentos-entrada-form.component.css']
 })
-export class DocumentsFormComponent {
+export class DocumentosEntradaFormComponent {
   form: FormGroup;
   isEditMode: boolean;
 
@@ -50,7 +50,7 @@ export class DocumentsFormComponent {
   constructor(
     private fb: FormBuilder,
     private service: DocumentsService,
-    public dialogRef: MatDialogRef<DocumentsFormComponent>,
+    public dialogRef: MatDialogRef<DocumentosEntradaFormComponent>,
     private http: HttpClient,
     @Inject(MAT_DIALOG_DATA) public data: Documento | null
   ) {

@@ -6,17 +6,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 // Importa la interfaz Documento desde el servicio
 import { DocumentsService, Documento } from '../services/documents.service';
-import { DocumentsFormComponent } from '../documents-form/documents-form.component';
+import { DocumentosEntradaFormComponent } from '../documentos-entrada-form/documentos-entrada-form.component';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-documents-list',
   standalone: true,
   imports: [CommonModule, MatCardModule, MatTableModule, MatButtonModule, MatDialogModule, MatIconModule],
-  templateUrl: './documents-list.component.html',
-  styleUrls: ['./documents-list.component.css']
+  templateUrl: './documentos-entrada-list.component.html',
+  styleUrls: ['./documentos-entrada-list.component.css']
 })
-export class DocumentsListComponent implements OnInit {
+export class DocumentosEntradaListComponent implements OnInit {
 
   // ✅ CORREGIDO: Lista simplificada con nombres en camelCase y 'acciones'
   displayedColumns: string[] = [
@@ -43,14 +43,14 @@ export class DocumentsListComponent implements OnInit {
   }
 
   openAddDialog() {
-    const ref = this.dialog.open(DocumentsFormComponent, { width: '900px' });
+    const ref = this.dialog.open(DocumentosEntradaFormComponent, { width: '900px' });
     ref.afterClosed().subscribe(result => {
       if (result) this.loadDocuments();
     });
   }
 
   editDocument(documento: Documento): void { // Usamos Documento para tipar
-    this.dialog.open(DocumentsFormComponent, {
+    this.dialog.open(DocumentosEntradaFormComponent, {
       width: '900px',
       data: documento
     }).afterClosed().subscribe(result => {
