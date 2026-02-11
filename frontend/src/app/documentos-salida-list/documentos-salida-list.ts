@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs'; // Necesario para simplificar el manejo d
 import { DocumentsService, Documento } from '../services/documents.service';
 // Asumimos que el formulario de salida usará el de entrada o un similar
 import { DocumentosEntradaFormComponent } from '../documentos-entrada-form/documentos-entrada-form.component';
+import {DocumentosSalidaFormComponent} from '../documentos-salida-form/documentos-salida-form';
 
 @Component({
   selector: 'app-documentos-salida-list',
@@ -66,14 +67,14 @@ export class DocumentosSalidaListComponent implements OnInit { // Cambio de nomb
 
   // Las funciones de edición, eliminación y diálogo se mantienen consistentes
   openAddDialog() {
-    const ref = this.dialog.open(DocumentosEntradaFormComponent, { width: '900px' });
+    const ref = this.dialog.open(DocumentosSalidaFormComponent, { width: '900px' });
     ref.afterClosed().subscribe(result => {
       if (result) this.loadDocuments();
     });
   }
 
   editDocument(documento: Documento): void {
-    this.dialog.open(DocumentosEntradaFormComponent, {
+    this.dialog.open(DocumentosSalidaFormComponent, {
       width: '900px',
       data: documento
     }).afterClosed().subscribe(result => {
@@ -83,7 +84,7 @@ export class DocumentosSalidaListComponent implements OnInit { // Cambio de nomb
 
   deleteDocument(id: number): void {
     if (confirm('¿Seguro que deseas eliminar este documento de salida?')) {
-      this.documentsService.deleteDocumento(id).subscribe({
+      this.documentsService.deleteDocumentoSalida(id).subscribe({
         next: () => this.loadDocuments(),
         error: (err: any) => console.error('Error eliminando documento', err)
       });

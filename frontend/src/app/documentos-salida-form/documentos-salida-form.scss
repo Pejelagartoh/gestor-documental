@@ -1,0 +1,20 @@
+/*
+ * Asegura que los campos de Angular Material se expandan
+ * para usar todo el espacio disponible en la cuadrícula.
+ */
+mat-form-field {
+  width: 100%;
+}
+
+/* Estilo para el área de texto (Materia) si es necesario */
+textarea {
+  resize: vertical;
+}
+
+/* Estilo para el botón de archivo (si se añade un input file) */
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}

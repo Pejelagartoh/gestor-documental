@@ -60,7 +60,7 @@ export class DocumentosEntradaListComponent implements OnInit {
 
   deleteDocument(id: number): void {
     if (confirm('¿Seguro que deseas eliminar este documento?')) {
-      this.documentsService.deleteDocumento(id).subscribe({
+      this.documentsService.deleteDocumentoEntrada(id).subscribe({
         next: () => this.loadDocuments(),
         error: (err: any) => console.error('Error eliminando documento', err)
       });

@@ -1,0 +1,152 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Editar' : 'Registro de' }} documento de salida</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="form-grid">
+
+    <!-- Tramo (OBLIGATORIO) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Tramo *</mat-label>
+      <mat-select formControlName="tramo">
+        <mat-option *ngFor="let t of tramos" [value]="t">{{ t }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('tramo')?.hasError('required')">Este campo es obligatorio</mat-error>
+    </mat-form-field>
+
+    <!-- Tipo Documento (OBLIGATORIO) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo Documento *</mat-label>
+      <mat-select formControlName="tipoDocumento">
+        <mat-option *ngFor="let td of tiposDocumento" [value]="td">{{ td }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('tipoDocumento')?.hasError('required')">Este campo es obligatorio</mat-error>
+    </mat-form-field>
+
+    <!-- N° Documento (OBLIGATORIO) -->
+    <mat-form-field appearance="outline">
+      <mat-label>N° Documento *</mat-label>
+      <input matInput formControlName="nroDocumento" />
+      <mat-error *ngIf="form.get('nroDocumento')?.hasError('required')">Este campo es obligatorio</mat-error>
+    </mat-form-field>
+
+    <!-- Fecha Documento (Fecha de Salida) (OBLIGATORIO) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha de Salida *</mat-label>
+      <input matInput [matDatepicker]="fd" formControlName="fechaDocumento" />
+      <mat-datepicker-toggle matSuffix [for]="fd"></mat-datepicker-toggle>
+      <mat-datepicker #fd></mat-datepicker>
+      <mat-error *ngIf="form.get('fechaDocumento')?.hasError('required')">Este campo es obligatorio</mat-error>
+    </mat-form-field>
+
+    <!-- Área Generadora (OBLIGATORIO) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Área Generadora *</mat-label>
+      <mat-select formControlName="areaResponsable">
+        <mat-option *ngFor="let a of areas" [value]="a">{{ a }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('areaResponsable')?.hasError('required')">Este campo es obligatorio</mat-error>
+    </mat-form-field>
+
+    <!-- Destinatario (OBLIGATORIO) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Destinatario *</mat-label>
+      <input matInput formControlName="destinatario" />
+      <mat-error *ngIf="form.get('destinatario')?.hasError('required')">Este campo es obligatorio</mat-error>
+    </mat-form-field>
+
+    <!-- Cargo Destinatario -->
+    <mat-form-field appearance="outline">
+      <mat-label>Cargo Destinatario</mat-label>
+      <input matInput formControlName="cargoDestinatario" />
+    </mat-form-field>
+
+    <!-- Remitente (Quien Firma/Envía) (OBLIGATORIO) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Remitente (Firma) *</mat-label>
+      <input matInput formControlName="remitente" />
+      <mat-error *ngIf="form.get('remitente')?.hasError('required')">Este campo es obligatorio</mat-error>
+    </mat-form-field>
+
+    <!-- Cargo Remitente -->
+    <mat-form-field appearance="outline">
+      <mat-label>Cargo Remitente</mat-label>
+      <input matInput formControlName="cargoRemitente" />
+    </mat-form-field>
+
+
+    <!-- Materia Documento (OBLIGATORIO) -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Materia Documento *</mat-label>
+      <textarea matInput formControlName="materiaDocumento" rows="2"></textarea>
+      <mat-error *ngIf="form.get('materiaDocumento')?.hasError('required')">Este campo es obligatorio</mat-error>
+    </mat-form-field>
+
+    <!-- Antecedentes Documento (Resumen/Contexto) -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Antecedentes/Resumen</mat-label>
+      <textarea matInput formControlName="antecedentesDocumento" rows="2"></textarea>
+    </mat-form-field>
+
+    <!-- Estado -->
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select formControlName="estado">
+        <mat-option *ngFor="let s of estados" [value]="s">{{ s }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- CAMPOS OCULTOS/NO APLICABLES A SALIDA, PERO REQUERIDOS EN EL MODELO -->
+    <!-- Se mantienen como parte del form, pero no son visibles para el usuario -->
+    <!-- Si la API de backend lo requiere, estos campos se enviarán con valores vacíos o nulos -->
+    <input type="hidden" formControlName="fechaIngreso" />
+    <input type="hidden" formControlName="instruyeRespuesta" />
+    <input type="hidden" formControlName="registroSalida" />
+    <input type="hidden" formControlName="tipoRespuesta" />
+    <input type="hidden" formControlName="fechaRespuesta" />
+    <input type="hidden" formControlName="remite" />
+    <input type="hidden" formControlName="a" />
+
+    <!-- Campo de Archivo -->
+    <div class="full-width file-input-group single-line">
+
+      <!-- Input de archivo oculto -->
+      <input
+        type="file"
+        style="display: none;"
+        #fileInput
+        (change)="onFileSelected($event)"
+        accept="application/pdf,image/*"
+      >
+
+      <!-- Botón visible para seleccionar archivo -->
+      <button
+        mat-raised-button
+        color="accent"
+        (click)="fileInput.click()"
+        type="button"
+        class="file-select-button"
+      >
+        <mat-icon>folder</mat-icon> {{ selectedFileName ? 'Cambiar Archivo' : 'Seleccionar Archivo Local' }}
+      </button>
+
+      <!-- Indicador de archivo seleccionado -->
+      <div *ngIf="selectedFileName" class="selected-file-name">
+        <mat-icon color="primary" style="margin-right: 4px;">attach_file</mat-icon>
+        <span class="file-name-text">{{ selectedFileName }}</span>
+      </div>
+
+    </div>
+    <!-- ---------------------------------------------------- -->
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dialogRef.close()">Cancelar</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="save()"
+    [disabled]="form.invalid"
+  >
+    {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+  </button>
+</mat-dialog-actions>

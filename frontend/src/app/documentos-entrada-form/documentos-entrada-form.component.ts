@@ -149,7 +149,7 @@ export class DocumentosEntradaFormComponent {
 
     if (this.isEditMode && doc.id && !this.selectedFile) {
       // Modo Edición sin nuevo archivo: Solo actualizamos los campos.
-      this.service.updateDocumento(doc.id, doc).subscribe({
+      this.service.updateDocumentoEntrada(doc.id, doc).subscribe({
         next: () => this.dialogRef.close(true),
         error: (err: any) => console.error('Error actualizando documento', err)
       });
@@ -161,7 +161,7 @@ export class DocumentosEntradaFormComponent {
       // Por la simplicidad actual, usaremos el mismo endpoint de creación (POST) si hay un archivo.
       // ⚠️ En un sistema robusto, se debería tener un endpoint PUT con Multer.
       console.warn('Advertencia: No se recomienda subir un archivo nuevo en modo edición. Se intentará crear un nuevo registro o solo guardar los campos si no hay archivo.');
-      this.service.updateDocumento(doc.id, doc).subscribe({
+      this.service.updateDocumentoEntrada(doc.id, doc).subscribe({
         next: () => this.dialogRef.close(true),
         error: (err: any) => console.error('Error actualizando documento (solo campos):', err)
       });

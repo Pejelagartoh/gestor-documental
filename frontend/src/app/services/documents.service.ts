@@ -27,6 +27,16 @@ export interface Documento {
   archivo?: string;
   created_at?: string;
   updated_at?: string;
+
+  // Campos específicos de documentos_salida
+  materia?: string;
+  nroLoe?: string;
+  incluye?: boolean;
+  registroEntrada?: string;
+  fechaDeRecepcion?: string;
+  plazo?: string;
+  fechaDeVencimiento?: string;
+  fechaDeRespuesta?: string;
 }
 
 @Injectable({
@@ -34,44 +44,83 @@ export interface Documento {
 })
 export class DocumentsService {
   // URLs para los diferentes endpoints
-  private apiUrlEntrada = 'http://localhost:3000/api/documentos'; // Endpoint original (asumimos Entrada)
-  private apiUrlSalida = 'http://localhost:3000/api/documentos-salida'; // NUEVO: Endpoint para Salida
+  private apiUrlEntrada = 'http://localhost:3000/api/documentos';
+  private apiUrlSalida = 'http://localhost:3000/api/documentos-salida'; // Endpoint para Salida
   private mailUrl = 'http://localhost:3000/api/send-email';
 
   constructor(private http: HttpClient) {}
 
-  // 1. OBTENER DOCUMENTOS DE ENTRADA
-  // Renombramos el antiguo getDocumentos() a getDocumentosEntrada() para mayor claridad.
+  // =========================================================================
+  // 1. MÉTODOS PARA DOCUMENTOS DE ENTRADA (/api/documentos)
+  // =========================================================================
+
   getDocumentosEntrada(): Observable<Documento[]> {
     return this.http.get<Documento[]>(this.apiUrlEntrada);
   }
 
-  // 2. OBTENER DOCUMENTOS DE SALIDA (Método requerido por el componente)
+  getDocumentoEntradaById(id: number): Observable<Documento> {
+    return this.http.get<Documento>(`${this.apiUrlEntrada}/${id}`);
+  }
+
+  addDocumentoEntrada(data: Documento): Observable<Documento> {
+    return this.http.post<Documento>(this.apiUrlEntrada, data);
+  }
+
+  updateDocumentoEntrada(id: number, data: Documento): Observable<Documento> {
+    return this.http.put<Documento>(`${this.apiUrlEntrada}/${id}`, data);
+  }
+
+  deleteDocumentoEntrada(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrlEntrada}/${id}`);
+  }
+
+  // =========================================================================
+  // 2. MÉTODOS PARA DOCUMENTOS DE SALIDA (/api/documentos-salida)
+  // =========================================================================
+
+  /**
+   * Obtiene todos los documentos de salida.
+   */
   getDocumentosSalida(): Observable<Documento[]> {
     return this.http.get<Documento[]>(this.apiUrlSalida);
   }
 
-  // 🔹 Obtener un documento por ID (utiliza la URL de entrada por defecto)
-  getDocumentoById(id: number): Observable<Documento> {
-    return this.http.get<Documento>(`${this.apiUrlEntrada}/${id}`);
+  /**
+   * Guarda un nuevo documento de salida (o actualiza si tiene ID).
+   * Este método es el que usará el formulario de creación.
+   */
+  saveDocumentoSalida(data: Documento): Observable<Documento> {
+    // Si tiene ID, actualiza; si no, crea.
+    if (data.id) {
+      return this.updateDocumentoSalida(data.id, data);
+    }
+    // Asumimos que la lógica de subida de archivo se maneja por separado,
+    // o el formulario lo envía como un objeto JSON simple sin 'file'.
+    return this.http.post<Documento>(this.apiUrlSalida, data);
   }
 
-  // 🔹 Crear nuevo documento
-  addDocumento(data: Documento): Observable<Documento> {
-    return this.http.post<Documento>(this.apiUrlEntrada, data);
+  /**
+   * Actualiza un documento de salida existente.
+   */
+  updateDocumentoSalida(id: number, data: Documento): Observable<Documento> {
+    return this.http.put<Documento>(`${this.apiUrlSalida}/${id}`, data);
   }
 
-  // 🔹 Actualizar documento existente
-  updateDocumento(id: number, data: Documento): Observable<Documento> {
-    return this.http.put<Documento>(`${this.apiUrlEntrada}/${id}`, data);
+  /**
+   * Elimina un documento de salida.
+   */
+  deleteDocumentoSalida(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrlSalida}/${id}`);
   }
 
-  // 🔹 Eliminar documento
-  deleteDocumento(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrlEntrada}/${id}`);
-  }
 
-  // 🔹 Enviar email
+  // =========================================================================
+  // 3. MÉTODOS GENERALES
+  // =========================================================================
+
+  /**
+   * Envía email (asume que el ID es de un Documento de Entrada).
+   */
   sendDocumentEmail(documentId: number, recipient: string, subject: string, body: string): Observable<any> {
     const payload = {
       documentId: documentId,
@@ -81,4 +130,8 @@ export class DocumentsService {
     };
     return this.http.post(this.mailUrl, payload);
   }
+
+  // Los siguientes métodos genéricos han sido eliminados/renombrados
+  // para usar los métodos específicos (Entrada/Salida) para mayor claridad.
+  // Por ejemplo, el antiguo addDocumento() ha sido reemplazado por addDocumentoEntrada().
 }
